@@ -11,26 +11,24 @@ composer require pollora/option
 ## Quick Start
 
 ```php
-use Pollora\Option\Application\Service\OptionService;
-use Pollora\Option\Adapter\Out\WordPress\WordPressOptionRepository;
-use Pollora\Option\Domain\Service\OptionValidationService;
-
-$service = new OptionService(
-    new WordPressOptionRepository,
-    new OptionValidationService
-);
+use Pollora\Option\Option;
 
 // Get with default
-$value = $service->get('site_title', 'My Site');
+$value = Option::get('site_title', 'My Site');
 
 // Smart upsert (creates or updates)
-$service->set('site_title', 'New Title');
+Option::set('site_title', 'New Title');
 
 // Check existence
-if ($service->exists('api_key')) {
-    $service->delete('api_key');
+if (Option::exists('api_key')) {
+    Option::delete('api_key');
 }
+
+// Update existing
+Option::update('posts_per_page', 20);
 ```
+
+> **Pollora framework users:** When the framework is available, prefer the Laravel facade `Pollora\Support\Facades\Option` for full DI container support. A notice is emitted if you use the standalone class within the framework.
 
 ## Documentation
 
