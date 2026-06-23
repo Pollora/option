@@ -1,0 +1,16 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Pollora\Option\Domain\Exception;
+
+/**
+ * Exception thrown when a required option is not found.
+ */
+final class OptionNotFoundException extends \Exception
+{
+    public function __construct(string $key)
+    {
+        parent::__construct(sprintf("Option '%s' not found", $key));
+    }
+}
