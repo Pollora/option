@@ -2,7 +2,7 @@
     "name": "pollora/option",
     "description": "A modern PHP package for WordPress option management with validation and immutable value objects",
     "type": "library",
-    "license": "GPL-2.0-or-later",
+    "license": "MIT",
     "authors": [
         {
             "name": "Amphibee",
