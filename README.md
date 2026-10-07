@@ -21,7 +21,7 @@ A dependency-free PHP wrapper around the WordPress options API. Keys and values 
 composer require pollora/option
 ```
 
-Requires PHP 8.2+ and WordPress (the adapter calls `get_option()`, `add_option()`, `update_option()` and `delete_option()`).
+Requires PHP 8.3+ and WordPress (the adapter calls `get_option()`, `add_option()`, `update_option()` and `delete_option()`).
 
 ## Quick start
 
