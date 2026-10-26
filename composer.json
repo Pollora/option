@@ -17,7 +17,8 @@
         "laravel/pint": "^v1.22.1",
         "mockery/mockery": "^1.6",
         "pestphp/pest": "^v3.8.2",
-        "phpstan/phpstan": "^2.1.16"
+        "phpstan/phpstan": "^2.1.16",
+        "pollora/harness": "^0.1"
     },
     "autoload": {
         "psr-4": {
@@ -46,7 +47,9 @@
         "phpstan": "phpstan analyse src tests --level=5",
         "phpstan:ci": "phpstan analyse src tests --level=5 --no-progress",
         "lint": "pint",
-        "lint:check": "pint --test"
+        "lint:check": "pint --test",
+        "qa": "@php vendor/bin/pollora-qa check",
+        "qa:fast": "@php vendor/bin/pollora-qa check --fast"
     },
     "minimum-stability": "dev",
     "prefer-stable": true
