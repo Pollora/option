@@ -13,6 +13,7 @@
         "php": "^8.3"
     },
     "require-dev": {
+        "antecedent/patchwork": "^2.2",
         "brain/monkey": "^2.6",
         "laravel/pint": "^v1.22.1",
         "mockery/mockery": "^1.6",
