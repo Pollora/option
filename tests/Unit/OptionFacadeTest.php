@@ -102,7 +102,10 @@ describe('Option static facade', function (): void {
         Option::get('facade_notice', 'fallback');
 
         expect($this->notices)->toHaveCount(1)
-            ->and($this->notices[0])->toContain('Pollora\Support\Facades\Option');
+            ->and($this->notices[0])->toBe(
+                'Using Pollora\Option\Option directly is not recommended when the Pollora framework is available. '
+                .'Use the Pollora\Support\Facades\Option facade instead for DI container support.'
+            );
     });
 
     it('raises the notice once, when the service is created, not on later calls', function (): void {
