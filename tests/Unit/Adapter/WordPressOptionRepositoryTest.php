@@ -37,6 +37,19 @@ describe('WordPressOptionRepository', function (): void {
         expect($this->repository->store(new Option('test_key', 'test_value', true)))->toBeTrue();
     });
 
+    it('store passes key, value, an empty deprecated argument and the autoload flag to add_option', function (): void {
+        $calls = [];
+        Brain\Monkey\Functions\when('add_option')->alias(function (...$args) use (&$calls): bool {
+            $calls[] = $args;
+
+            return true;
+        });
+
+        $this->repository->store(new Option('test_key', ['v'], false));
+
+        expect($calls)->toBe([['test_key', ['v'], '', false]]);
+    });
+
     it('update returns true', function (): void {
         Brain\Monkey\Functions\when('update_option')->justReturn(true);
 

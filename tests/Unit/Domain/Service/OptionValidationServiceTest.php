@@ -22,6 +22,10 @@ describe('OptionValidationService', function (): void {
         $this->service->validateKey(str_repeat('a', 192));
     })->throws(InvalidOptionException::class, 'Option key cannot exceed 191 characters');
 
+    it('accepts a single character key', function (): void {
+        $this->service->validateKey('a');
+    })->throwsNoExceptions();
+
     it('accepts maximum length key', function (): void {
         $this->service->validateKey(str_repeat('a', 191));
     })->throwsNoExceptions();

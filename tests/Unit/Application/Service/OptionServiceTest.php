@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Pollora\Option\Application\Service\OptionService;
 use Pollora\Option\Domain\Contract\OptionRepositoryInterface;
+use Pollora\Option\Domain\Exception\InvalidOptionException;
 use Pollora\Option\Domain\Model\Option;
 use Pollora\Option\Domain\Service\OptionValidationService;
 
@@ -62,5 +63,31 @@ describe('OptionService', function (): void {
         $this->repository->shouldReceive('exists')->with('test_key')->once()->andReturn(true);
 
         expect($this->service->exists('test_key'))->toBeTrue();
+    });
+
+    it('rejects an invalid key before touching the repository', function (string $method, array $args): void {
+        $this->repository->shouldNotReceive('get', 'exists', 'update', 'store', 'delete');
+
+        expect(fn () => $this->service->{$method}(...$args))
+            ->toThrow(InvalidOptionException::class, 'Option key cannot be empty');
+    })->with([
+        'get' => ['get', ['']],
+        'set' => ['set', ['', 'v']],
+        'update' => ['update', ['', 'v']],
+        'delete' => ['delete', ['']],
+        'exists' => ['exists', ['']],
+    ]);
+
+    it('rejects an invalid value before touching the repository', function (string $method): void {
+        $this->repository->shouldNotReceive('get', 'exists', 'update', 'store', 'delete');
+
+        expect(fn () => $this->service->{$method}('key', static fn (): int => 1))
+            ->toThrow(InvalidOptionException::class, 'Option value must be serializable');
+    })->with(['set', 'update']);
+
+    it('accepts a single character key', function (): void {
+        $this->repository->shouldReceive('exists')->with('a')->once()->andReturn(true);
+
+        expect($this->service->exists('a'))->toBeTrue();
     });
 });
