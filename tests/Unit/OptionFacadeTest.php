@@ -32,9 +32,20 @@ describe('Option static facade', function (): void {
 
         $property = new ReflectionProperty(Option::class, 'service');
         $property->setValue(null, null);
+
+        // Once the framework facade stand-in is loaded (it cannot be unloaded),
+        // every later service creation raises the notice: collect it here.
+        $this->notices = [];
+        $notices = &$this->notices;
+        set_error_handler(function (int $level, string $message) use (&$notices): bool {
+            $notices[] = $message;
+
+            return true;
+        }, E_USER_NOTICE);
     });
 
     afterEach(function (): void {
+        restore_error_handler();
         $property = new ReflectionProperty(Option::class, 'service');
         $property->setValue(null, null);
         Brain\Monkey\tearDown();
@@ -82,4 +93,26 @@ describe('Option static facade', function (): void {
     it('rejects an empty key through the validator', function (): void {
         Option::get('');
     })->throws(InvalidOptionException::class);
+
+    it('warns that the framework facade should be used when the framework is available', function (): void {
+        if (! class_exists(Pollora\Support\Facades\Option::class, false)) {
+            require_once __DIR__.'/../Fixtures/FrameworkOptionFacade.php';
+        }
+
+        Option::get('facade_notice', 'fallback');
+
+        expect($this->notices)->toHaveCount(1)
+            ->and($this->notices[0])->toContain('Pollora\Support\Facades\Option');
+    });
+
+    it('raises the notice once, when the service is created, not on later calls', function (): void {
+        if (! class_exists(Pollora\Support\Facades\Option::class, false)) {
+            require_once __DIR__.'/../Fixtures/FrameworkOptionFacade.php';
+        }
+
+        Option::get('facade_first');
+        Option::get('facade_second');
+
+        expect($this->notices)->toHaveCount(1);
+    });
 });
