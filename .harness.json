@@ -8,6 +8,6 @@
         "phpstan_level": 5,
         "phpstan_baseline": 0,
         "coverage": 99.0,
-        "msi": 98.0
+        "msi": 100.5
     }
 }
