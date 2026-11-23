@@ -5,12 +5,12 @@ declare(strict_types=1);
 use Pollora\Option\Domain\Model\Option;
 
 describe('Option', function (): void {
-    it('can create option with default autoload', function (): void {
+    it('leaves the autoload unset by default', function (): void {
         $option = new Option('test_key', 'test_value');
 
         expect($option->key)->toBe('test_key')
             ->and($option->value)->toBe('test_value')
-            ->and($option->autoload)->toBeTrue();
+            ->and($option->autoload)->toBeNull();
     });
 
     it('can create option with custom autoload', function (): void {

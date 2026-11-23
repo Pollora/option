@@ -36,6 +36,12 @@ $option = new Option('api_credentials', [
 $updated = $option->withValue(['key' => 'new123', 'secret' => 'new789']);
 ```
 
+### Autoload
+
+`autoload` is `null` unless you set it. `set()` and `update()` never choose an autoload: an existing option keeps the
+one it has (so an option created with autoload off stays off), and a new option is autoloaded. Passing `true` or
+`false` to `Option` makes `OptionRepositoryInterface::update()` overwrite the stored autoload, as `update_option()` does.
+
 ## Validation
 
 Keys and values are validated automatically by `OptionValidationService`:
