@@ -5,6 +5,8 @@ All notable changes to this package are documented here. The format follows
 
 ## [Unreleased]
 
+## [1.1.3] - 2026-11-23
+
 ### Fixed
 
 - `set()` and `update()` no longer switch an option's autoload from off back to on: the current autoload is kept unless
