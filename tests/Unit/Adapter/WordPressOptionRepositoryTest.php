@@ -50,6 +50,46 @@ describe('WordPressOptionRepository', function (): void {
         expect($calls)->toBe([['test_key', ['v'], '', false]]);
     });
 
+    it('store autoloads a new option when no autoload is given', function (): void {
+        $calls = [];
+        Brain\Monkey\Functions\when('add_option')->alias(function (...$args) use (&$calls): bool {
+            $calls[] = $args;
+
+            return true;
+        });
+
+        $this->repository->store(new Option('test_key', 'v'));
+
+        expect($calls)->toBe([['test_key', 'v', '', true]]);
+    });
+
+    it('update passes a null autoload so that WordPress keeps the stored one', function (): void {
+        $calls = [];
+        Brain\Monkey\Functions\when('update_option')->alias(function (...$args) use (&$calls): bool {
+            $calls[] = $args;
+
+            return true;
+        });
+
+        $this->repository->update(new Option('test_key', 'v'));
+
+        expect($calls)->toBe([['test_key', 'v', null]]);
+    });
+
+    it('update passes an explicit autoload through, true or false', function (): void {
+        $calls = [];
+        Brain\Monkey\Functions\when('update_option')->alias(function (...$args) use (&$calls): bool {
+            $calls[] = $args;
+
+            return true;
+        });
+
+        $this->repository->update(new Option('a', 'v', false));
+        $this->repository->update(new Option('b', 'v', true));
+
+        expect($calls)->toBe([['a', 'v', false], ['b', 'v', true]]);
+    });
+
     it('update returns true', function (): void {
         Brain\Monkey\Functions\when('update_option')->justReturn(true);
 

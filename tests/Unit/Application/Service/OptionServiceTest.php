@@ -47,6 +47,15 @@ describe('OptionService', function (): void {
         expect($this->service->set('test_key', 'test_value'))->toBeTrue();
     });
 
+    it('set and update make no autoload choice, so the repository can keep the stored one', function (string $method): void {
+        $this->repository->shouldReceive('exists')->andReturn(true);
+        $this->repository->shouldReceive('update')->once()
+            ->withArgs(fn (Option $option): bool => $option->autoload === null)
+            ->andReturn(true);
+
+        expect($this->service->{$method}('test_key', 'v'))->toBeTrue();
+    })->with(['set', 'update']);
+
     it('update calls repository update', function (): void {
         $this->repository->shouldReceive('update')->once()->andReturn(true);
 

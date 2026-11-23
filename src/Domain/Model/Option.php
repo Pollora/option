@@ -18,12 +18,13 @@ final readonly class Option
     /**
      * @param  string  $key  The option key (unique identifier in wp_options).
      * @param  mixed  $value  The option value (any serializable type).
-     * @param  bool  $autoload  Whether WordPress should autoload this option.
+     * @param  bool|null  $autoload  Whether WordPress should autoload this option; null means "no explicit choice":
+     *                               an update keeps the autoload the option already has, a new option is autoloaded.
      */
     public function __construct(
         public string $key,
         public mixed $value,
-        public bool $autoload = true
+        public ?bool $autoload = null
     ) {}
 
     /**

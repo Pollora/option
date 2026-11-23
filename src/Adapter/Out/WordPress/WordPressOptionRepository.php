@@ -34,7 +34,8 @@ final class WordPressOptionRepository implements OptionRepositoryInterface
      */
     public function store(Option $option): bool
     {
-        return add_option($option->key, $option->value, '', $option->autoload);
+        // A new option is autoloaded unless the caller says otherwise.
+        return add_option($option->key, $option->value, '', $option->autoload ?? true);
     }
 
     /**
@@ -42,6 +43,8 @@ final class WordPressOptionRepository implements OptionRepositoryInterface
      */
     public function update(Option $option): bool
     {
+        // A null autoload is passed through: update_option() then leaves the stored autoload of an existing option
+        // untouched, whereas a boolean (even true) overwrites it.
         return update_option($option->key, $option->value, $option->autoload);
     }
 

@@ -64,6 +64,24 @@ it('autoloads a new option', function (): void {
     expect(storedAutoload('pollora_wpint_c'))->toBeIn(['yes', 'on', 'auto', 'auto-on']);
 });
 
+it('keeps the autoload of an option that was created without autoload, on set() and on update()', function (): void {
+    add_option('pollora_wpint_c', 'v1', '', false);
+
+    expect(storedAutoload('pollora_wpint_c'))->toBeIn(['no', 'off']);
+
+    Option::set('pollora_wpint_c', 'v2');
+    wp_cache_flush();
+
+    expect(storedAutoload('pollora_wpint_c'))->toBeIn(['no', 'off'])
+        ->and(Option::get('pollora_wpint_c'))->toBe('v2');
+
+    Option::update('pollora_wpint_c', 'v3');
+    wp_cache_flush();
+
+    expect(storedAutoload('pollora_wpint_c'))->toBeIn(['no', 'off'])
+        ->and(Option::get('pollora_wpint_c'))->toBe('v3');
+});
+
 it('stores an option that update() creates, as WordPress does', function (): void {
     expect(Option::update('pollora_wpint_a', 'by update'))->toBeTrue()
         ->and(Option::exists('pollora_wpint_a'))->toBeTrue()
