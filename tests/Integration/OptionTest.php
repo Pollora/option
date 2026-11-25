@@ -94,10 +94,12 @@ it('reads back the falsy values it stored, with the type WordPress keeps', funct
     Option::set('pollora_wpint_flag', false);
     Option::set('pollora_wpint_zero', 0);
 
+    $zero = Option::get('pollora_wpint_zero', 'default');
+
     expect(Option::exists('pollora_wpint_flag'))->toBeTrue()
         ->and(Option::get('pollora_wpint_flag', 'default'))->not->toBe('default')
         ->and(Option::exists('pollora_wpint_zero'))->toBeTrue()
-        ->and((int) Option::get('pollora_wpint_zero', 'default'))->toBe(0);
+        ->and(is_numeric($zero) ? (int) $zero : null)->toBe(0);
 });
 
 it('refuses a key the options table cannot hold before it reaches the database', function (): void {
@@ -118,7 +120,7 @@ it('writes through the filters WordPress offers on an option', function (): void
     add_filter('pre_update_option_pollora_wpint_a', function (mixed $value) use (&$seen): mixed {
         $seen[] = $value;
 
-        return strtoupper((string) $value);
+        return is_string($value) ? strtoupper($value) : $value;
     });
 
     $service = new OptionService(new WordPressOptionRepository, new OptionValidationService);
