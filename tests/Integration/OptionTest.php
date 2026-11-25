@@ -27,7 +27,11 @@ function storedAutoload(string $key): ?string
 {
     global $wpdb;
 
-    return $wpdb->get_var($wpdb->prepare("SELECT autoload FROM {$wpdb->options} WHERE option_name = %s", $key));
+    if (! $wpdb instanceof wpdb) {
+        throw new LogicException('WordPress has not loaded its database object.');
+    }
+
+    return $wpdb->get_var($wpdb->prepare('SELECT autoload FROM %i WHERE option_name = %s', $wpdb->options, $key));
 }
 
 it('stores, reads, updates and deletes an option in the database', function (): void {
