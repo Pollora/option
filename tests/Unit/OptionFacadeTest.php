@@ -5,9 +5,13 @@ declare(strict_types=1);
 use Brain\Monkey\Functions;
 use Pollora\Option\Domain\Exception\InvalidOptionException;
 use Pollora\Option\Option;
+use Pollora\Option\Tests\Fixtures\RecordedNotices;
 
-describe('Option static facade', function (): void {
-    beforeEach(function (): void {
+// The notices raised while a test runs; a typed holder, shared with the closures below.
+$notices = new RecordedNotices;
+
+describe('Option static facade', function () use ($notices): void {
+    beforeEach(function () use ($notices): void {
         Brain\Monkey\setUp();
 
         $this->store = new ArrayObject;
@@ -35,10 +39,9 @@ describe('Option static facade', function (): void {
 
         // Once the framework facade stand-in is loaded (it cannot be unloaded),
         // every later service creation raises the notice: collect it here.
-        $this->notices = [];
-        $notices = &$this->notices;
-        set_error_handler(function (int $level, string $message) use (&$notices): bool {
-            $notices[] = $message;
+        $notices->clear();
+        set_error_handler(function (int $level, string $message) use ($notices): bool {
+            $notices->record($message);
 
             return true;
         }, E_USER_NOTICE);
@@ -94,21 +97,21 @@ describe('Option static facade', function (): void {
         Option::get('');
     })->throws(InvalidOptionException::class);
 
-    it('warns that the framework facade should be used when the framework is available', function (): void {
+    it('warns that the framework facade should be used when the framework is available', function () use ($notices): void {
         if (! class_exists(Pollora\Support\Facades\Option::class, false)) {
             require_once __DIR__.'/../Fixtures/FrameworkOptionFacade.php';
         }
 
         Option::get('facade_notice', 'fallback');
 
-        expect($this->notices)->toHaveCount(1)
-            ->and($this->notices[0])->toBe(
+        expect($notices->messages)->toHaveCount(1)
+            ->and($notices->messages[0])->toBe(
                 'Using Pollora\Option\Option directly is not recommended when the Pollora framework is available. '
                 .'Use the Pollora\Support\Facades\Option facade instead for DI container support.'
             );
     });
 
-    it('raises the notice once, when the service is created, not on later calls', function (): void {
+    it('raises the notice once, when the service is created, not on later calls', function () use ($notices): void {
         if (! class_exists(Pollora\Support\Facades\Option::class, false)) {
             require_once __DIR__.'/../Fixtures/FrameworkOptionFacade.php';
         }
@@ -116,6 +119,6 @@ describe('Option static facade', function (): void {
         Option::get('facade_first');
         Option::get('facade_second');
 
-        expect($this->notices)->toHaveCount(1);
+        expect($notices->messages)->toHaveCount(1);
     });
 });
