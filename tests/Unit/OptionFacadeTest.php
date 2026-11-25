@@ -6,30 +6,33 @@ use Brain\Monkey\Functions;
 use Pollora\Option\Domain\Exception\InvalidOptionException;
 use Pollora\Option\Option;
 use Pollora\Option\Tests\Fixtures\RecordedNotices;
+use Pollora\Option\Tests\Fixtures\StoredOptions;
 
 // The notices raised while a test runs; a typed holder, shared with the closures below.
 $notices = new RecordedNotices;
 
-describe('Option static facade', function () use ($notices): void {
-    beforeEach(function () use ($notices): void {
+// The options the stubbed WordPress functions keep.
+$store = new StoredOptions;
+
+describe('Option static facade', function () use ($notices, $store): void {
+    beforeEach(function () use ($notices, $store): void {
         Brain\Monkey\setUp();
 
-        $this->store = new ArrayObject;
-        $store = $this->store;
+        $store->clear();
 
-        Functions\when('get_option')->alias(fn ($key, $default = false) => $store->offsetExists($key) ? $store[$key] : $default);
-        Functions\when('add_option')->alias(function ($key, $value) use ($store): bool {
-            $store[$key] = $value;
-
-            return true;
-        });
-        Functions\when('update_option')->alias(function ($key, $value) use ($store): bool {
-            $store[$key] = $value;
+        Functions\when('get_option')->alias(fn (string $key, mixed $default = false) => $store->has($key) ? $store->options[$key] : $default);
+        Functions\when('add_option')->alias(function (string $key, mixed $value) use ($store): bool {
+            $store->put($key, $value);
 
             return true;
         });
-        Functions\when('delete_option')->alias(function ($key) use ($store): bool {
-            $store->offsetUnset($key);
+        Functions\when('update_option')->alias(function (string $key, mixed $value) use ($store): bool {
+            $store->put($key, $value);
+
+            return true;
+        });
+        Functions\when('delete_option')->alias(function (string $key) use ($store): bool {
+            $store->forget($key);
 
             return true;
         });
@@ -58,9 +61,9 @@ describe('Option static facade', function () use ($notices): void {
         expect(Option::get('facade_missing', 'fallback'))->toBe('fallback');
     });
 
-    it('stores a new option with set and reads it back', function (): void {
+    it('stores a new option with set and reads it back', function () use ($store): void {
         expect(Option::set('facade_new', 'value'))->toBeTrue()
-            ->and($this->store['facade_new'])->toBe('value')
+            ->and($store->options['facade_new'])->toBe('value')
             ->and(Option::get('facade_new'))->toBe('value')
             ->and(Option::exists('facade_new'))->toBeTrue();
     });
@@ -72,9 +75,9 @@ describe('Option static facade', function () use ($notices): void {
         expect(Option::get('facade_upsert'))->toBe('two');
     });
 
-    it('updates an option', function (): void {
+    it('updates an option', function () use ($store): void {
         expect(Option::update('facade_update', ['a' => 1]))->toBeTrue()
-            ->and($this->store['facade_update'])->toBe(['a' => 1]);
+            ->and($store->options['facade_update'])->toBe(['a' => 1]);
     });
 
     it('deletes an option', function (): void {
