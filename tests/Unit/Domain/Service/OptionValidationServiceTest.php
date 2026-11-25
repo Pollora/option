@@ -53,7 +53,7 @@ describe('OptionValidationService', function (): void {
     })->throwsNoExceptions();
 
     it('throws exception for resource value', function (): void {
-        $resource = fopen('php://memory', 'r');
+        $resource = fopen('php://memory', 'r') ?: throw new RuntimeException('php://memory cannot be opened');
         try {
             $this->service->validateValue($resource);
         } finally {
